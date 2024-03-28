@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.pointnet import PointNetBackbone
+from .pointnet import PointNetBackbone
 
 class BBoxEst(nn.Module):
     def __init__(self, num_points, num_global_feats):

@@ -1,9 +1,9 @@
 import os
 import numpy as np
 
-from ds_loaders.pcdet import PerObjectDataLoader
-from models.bbox_est import BBoxEst
-from models.pointnet import PointNetLoss
+from .ds_loaders.pcdet import PerObjectDataLoader
+from .models.bbox_est import BBoxEst
+from .models.pointnet import PointNetLoss
 
 import torch
 import torch.nn as nn
