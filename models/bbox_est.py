@@ -26,7 +26,7 @@ class BBoxEst(nn.Module):
         self.linear_dims = nn.Linear(16, 3)
         # self.linear_roty_sin = nn.Linear(16, 1)
         # self.linear_roty_cos = nn.Linear(16, 1)
-        self.linear_roty = nn.Linear(16,1)
+        # self.linear_roty = nn.Linear(16,1)
         self.linear_class = nn.Linear(16, 2)
         
     def forward(self, x):
@@ -42,7 +42,8 @@ class BBoxEst(nn.Module):
         # roty_sin = self.linear_roty_sin(x)
         # roty_cos = self.linear_roty_cos(x)
         # roty = torch.atan2(roty_sin, roty_cos)
-        roty = self.linear_roty(x)
+        # roty = self.linear_roty(x)
         obj_class = self.linear_class(x)
         
-        return center, dims, roty, obj_class, crit_idxs, A_feat
+        # return center, dims, roty, obj_class, crit_idxs, A_feat
+        return center, dims, obj_class, crit_idxs, A_feat

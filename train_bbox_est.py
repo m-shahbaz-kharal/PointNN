@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-dataset_path = "C:\\Users\\mu290328\OneDrive - University of Central Florida\\urbanity - MSI-LP\\hands_on\\datasets\\carla_gabby_20ft_intersection_all_lidars\\output\\post\\per_object_pcdet_dataset"
+dataset_path = "C:\\Users\\MShahbazKharal\\OneDrive - University of Central Florida\\urbanity - MSI-LP\\hands_on\\datasets\\carla_gabby_20ft_intersection_all_lidars\\output\\post\\per_object_pcdet_dataset"
 npy_path = os.path.join(dataset_path, 'point_cloud')
 label_path = os.path.join(dataset_path, 'label')
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -52,8 +52,8 @@ def train_one_epoch(loader, model, point_net_loss, bbox_loss, optim, scheduler):
     last_center_loss = 0.
     running_extent_loss = 0.
     last_extent_loss = 0.
-    running_roty_loss = 0.
-    last_roty_loss = 0.
+    # running_roty_loss = 0.
+    # last_roty_loss = 0.
     running_pn_loss = 0.
     last_pn_loss = 0.
     
@@ -67,17 +67,19 @@ def train_one_epoch(loader, model, point_net_loss, bbox_loss, optim, scheduler):
         pcd = pcd.transpose(2,1).to(device)
         lbl_center = lbl_center.to(device)
         lbl_extent = lbl_extent.to(device)
-        lbl_orient = lbl_orient.to(device).reshape(-1,1)
+        # lbl_orient = lbl_orient.to(device).reshape(-1,1)
         lbl_class = lbl_class.to(device)
         
-        center, dims, roty, obj_class, crit_idxs, A_feat = model(pcd)
+        # center, dims, roty, obj_class, crit_idxs, A_feat = model(pcd)
+        center, dims, obj_class, crit_idxs, A_feat = model(pcd)
         
         center_loss = bbox_loss(center, lbl_center)
         extent_loss = bbox_loss(dims, lbl_extent)
-        roty_loss = bbox_loss(roty, lbl_orient)
+        # roty_loss = bbox_loss(roty, lbl_orient)
         pn_loss = point_net_loss(obj_class, lbl_class, A_feat)
         
-        total_loss =  center_loss + extent_loss + roty_loss + pn_loss
+        # total_loss =  center_loss + extent_loss + roty_loss + pn_loss
+        total_loss =  center_loss + extent_loss + pn_loss
         total_loss.backward()
         
         optim.step()
@@ -85,7 +87,7 @@ def train_one_epoch(loader, model, point_net_loss, bbox_loss, optim, scheduler):
         
         running_center_loss += center_loss.item()
         running_extent_loss += extent_loss.item()
-        running_roty_loss += roty_loss.item()
+        # running_roty_loss += roty_loss.item()
         running_pn_loss += pn_loss.item()
         
         running_total_loss += total_loss.item()
@@ -93,20 +95,20 @@ def train_one_epoch(loader, model, point_net_loss, bbox_loss, optim, scheduler):
         if i % 16 == 15:
             last_center_loss = running_center_loss / 16.
             last_extent_loss = running_extent_loss / 16.
-            last_roty_loss = running_roty_loss / 16.
+            # last_roty_loss = running_roty_loss / 16.
             last_pn_loss = running_pn_loss / 16.
             last_total_loss = running_total_loss / 16.
             
             print(f'Batch: {i+1}')
             print(f'Avg. Center Loss: {last_center_loss}')
             print(f'Avg. Extent Loss: {last_extent_loss}')
-            print(f'Avg. Rot Y Loss: {last_roty_loss}')
+            # print(f'Avg. Rot Y Loss: {last_roty_loss}')
             print(f'Avg. PointNet Loss: {last_pn_loss}')
             print(f'Avg. Total Loss: {last_total_loss}')
             
             running_center_loss = 0.
             running_extent_loss = 0.
-            running_roty_loss = 0.
+            # running_roty_loss = 0.
             running_pn_loss = 0.
             running_total_loss = 0
             
@@ -129,9 +131,11 @@ def eval_one_epoch(loader, model, point_net_loss, bbox_loss):
             lbl_orient = lbl_orient.to(device).reshape(-1,1)
             lbl_class = lbl_class.to(device)
             
-            center, dims, roty, obj_class, crit_idxs, A_feat = model(pcd)
+            # center, dims, roty, obj_class, crit_idxs, A_feat = model(pcd)
+            center, dims, obj_class, crit_idxs, A_feat = model(pcd)
             pn_loss = point_net_loss(obj_class, lbl_class, A_feat)
-            loss = bbox_loss(center, lbl_center) + bbox_loss(dims, lbl_extent) + bbox_loss(roty, lbl_orient) + pn_loss
+            # loss = bbox_loss(center, lbl_center) + bbox_loss(dims, lbl_extent) + bbox_loss(roty, lbl_orient) + pn_loss
+            loss = bbox_loss(center, lbl_center) + bbox_loss(dims, lbl_extent) + pn_loss
             
             running_loss += loss.item()
             i += 1
