@@ -15,7 +15,7 @@ npy_path = os.path.join(dataset_path, 'point_cloud')
 label_path = os.path.join(dataset_path, 'label')
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-def test_visualize(pcd, center, extent, ry, obj_class):
+def inference_visualize(pcd, center, extent, ry, obj_class):
     pcd_np = pcd.detach().cpu().numpy()[0]
     center = center.detach().cpu().numpy()[0]
     extent = extent.detach().cpu().numpy()[0]
@@ -51,7 +51,7 @@ def main():
                 lbl_orient = lbl_orient.to(device).reshape(-1,1)
                 lbl_class = lbl_class.to(device)
                 center, dims, roty, obj_class, crit_idxs, A_feat = model(pcd)
-                test_visualize(pcd_orig, center, dims, roty, obj_class)
+                inference_visualize(pcd_orig, center, dims, roty, obj_class)
     
 if __name__ == '__main__': main()
     
